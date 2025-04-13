@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import BlindAuction from '../BlindAuction.sol';
+import { BlindAuctionABI, BlindAuctionAddress, BlindAuctionContract } from './contracts/BlindAuction';
 
 const App: React.FC = () => {
   const [account, setAccount] = useState<string>('');
-  const [contract, setContract] = useState<any>(null);
+  const [contract, setContract] = useState<BlindAuctionContract | null>(null);
   const [auctionStatus, setAuctionStatus] = useState<string>('Not Started');
   const [highestBid, setHighestBid] = useState<string>('0');
   const [bidAmount, setBidAmount] = useState<string>('');
@@ -26,8 +26,11 @@ const App: React.FC = () => {
         setAccount(address);
 
         // Initialize contract
-        const contractAddress = 'YOUR_CONTRACT_ADDRESS'; // Replace with deployed contract address
-        const contract = new ethers.Contract(contractAddress, BlindAuction.abi, signer);
+        const contract = new ethers.Contract(
+          BlindAuctionAddress,
+          BlindAuctionABI,
+          signer
+        ) as BlindAuctionContract;
         setContract(contract);
 
         // Load initial data
@@ -40,7 +43,7 @@ const App: React.FC = () => {
     }
   };
 
-  const loadAuctionData = async (contract: any) => {
+  const loadAuctionData = async (contract: BlindAuctionContract) => {
     try {
       const ended = await contract.ended();
       const highestBid = await contract.highestBid();
